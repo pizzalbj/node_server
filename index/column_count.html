@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>div 点击</title>
+    <style>
+    	/* ================== bug one ================ */
+    	.container{
+			width: 100%;
+			column-count: 2;
+			-webkit-column-count: 2;
+			-moz-column-count: 2;
+
+			/* 不设置column-gap */
+			/* column-gap: 80px;
+			-webkit-column-gap: 80px;
+			-moz-column-gap: 80px; */
+
+			/* 默认值 */
+			column-gap: normal;
+			-webkit-column-gap: normal;
+  			-moz-column-gap: normal;
+		}
+		
+		.item{
+			break-inside: avoid;
+			margin-bottom:10px;
+		}
+
+
+
+		/* ================== bug two ================ */
+		.v-list {
+		  	width: 100%;
+		  	column-count: 2;
+		  	-webkit-column-count: 2;
+		  	column-gap: 16px;
+		  	-webkit-column-gap: 16px;
+		}
+
+		.v-item {
+			height: 120px;
+		  	margin-bottom: 24px;
+		  	box-sizing: border-box;
+		  	overflow: hidden;
+		  	background-color: red;
+
+		  	break-inside: avoid-column;
+		  	-webkit-break-inside: avoid-column;
+		  	-webkit-column-break-inside: avoid-column;
+		}
+
+		.v-item .nav {
+			display: block;
+		  	width: 100%;
+		  	height: 60px;
+		  	position: relative; /* =================================== but two 修改这里 =================================== */
+		}
+
+		.v-item-mes {
+		  	position: absolute;
+		  	left: 0;
+		  	right: 0;
+		  	bottom: 0;
+		  	padding: 12px 24px;
+		  	text-align: center;
+		  	background-color: transparent;
+		  	background-image: linear-gradient(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, .5));
+		  	overflow: hidden;
+		}
+
+		.v-item-mes .name {
+		  	overflow: hidden;
+		  	white-space: nowrap;
+		  	text-overflow: ellipsis; 
+		}
+
+
+		.v-item-intr {
+		  	width: 100%;
+		  	height: auto;
+		  	padding: 20px;
+		}
+    </style>
+</head>
+<body style="height: 4000px">
+	<!--
+	  	Bug desc:
+	  	下面的div class="container"（下面简称divA）使用了column-count
+	  	>>> 若divA没有设置column-gap或者设置为默认值normal，在body添加了font-size: 0后，divA的column-gap变成0
+	-->
+	<div style="font-size: 0"> <!-- =================================== but one 修改这里 =================================== -->
+		<div class="container">
+		    <div class="item">
+		        <div class="itemContent" style="background-color: blue; height: 50px">1</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: rosybrown; height: 100px">2</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: red; height: 80px">3</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: blue; height: 50px">19</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: red; height: 80px">20</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: blue; height: 50px">1</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: blue; height: 50px">19</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: red; height: 80px">20</div>
+		    </div>
+		    <div class="item">
+		        <div class="itemContent" style="background-color: blue; height: 50px">1</div>
+		    </div>
+		</div>
+	</div>
+	<br>
+	<br>
+
+	<!--
+		Bug desc:
+		position: relative对column-count的影响。在 Safari 上有问题
+	-->
+	<div class="v-list">
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	    <div class="v-item flex-c-fs-sr">
+	      	<a url="/" class="nav">
+	        	<div class="v-item-mes">some text</div>
+	      	</a>
+	      	<div>啦啦啦啦啦啦</div>
+	    </div>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

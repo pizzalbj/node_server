@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>div 点击</title>
+    <style></style>
+</head>
+<body>
+    <div role="button">金枪鱼</div>
+</body>
+
+<script>
+    var divClick = document.querySelector("div[role=button]")
+    console.log(divClick)
+
+    divClick.addEventListener("click", function() {
+    	alert("div click")
+    })
+</script>
+</html>

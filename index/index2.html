@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+  <title>swiper demo</title>
+  <link rel="stylesheet" href="/css/swiper.min.css">
+  <style>
+    .swiper-container{
+      display: block;
+      width: 80%;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .swiper-slide{
+      width: 46%;
+      height: 120px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .swiper-slide img {
+      display: block;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid red;
+    }
+    .red{
+      background: red;
+    }
+    .green{
+      background: green;
+    }
+    .blue{
+      background: blue;
+    }
+    .orange{
+      background: orange;
+    }
+    .pink{
+      background: pink;
+    }
+</style>
+</head>
+<body>
+<div class="swiper-container swiper-container-three">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide red"><img src="/images/baby_one.png" /></div>
+        <div class="swiper-slide green"><img src="/images/baby_two.png" /></div>
+        <div class="swiper-slide blue"><img src="/images/baby_three.png" /></div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+<br/>
+<div class="swiper-container swiper-container-two">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide red"><img src="/images/baby_one.png" /></div>
+        <div class="swiper-slide green"><img src="/images/baby_two.png" /></div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+<br/>
+<!-- 应用 -->
+<div class="swiper-container swiper-container-one">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide"><img src="/images/baby_one.png" /></div>
+        <div class="swiper-slide"><img src="/images/baby_two.png" /></div>
+        <div class="swiper-slide"><img src="/images/baby_three.png" /></div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+<script src="/js/swiper.min.js"></script>
+<script>
+  var swiper = new Swiper('.swiper-container-three',{  // 3 个小孩 开启循环
+      // autoplay: 1000,
+      grabCursor: true,  // 鼠标覆盖Swiper时指针会变成手掌形状，拖动时指针会变成抓手形状
+      pagination:'.swiper-pagination',  // 分页器
+      initialSlide: 1,  // 设定初始化时slide的索引
+      loop: true,  // 开启循环
+      centeredSlides: true,  // 活动块会居中，而不是默认状态下的居左
+      slidesPerView: 'auto',  // 一行显示 slider 的个数
+      // shortSwipes: false,
+      effect: 'coverflow',
+      coverflow: {
+        rotate: 0, // 滑动时旋转角度
+        stretch: 0,  // 聚合宽度
+        depth: 300,  // 景深
+        modifier: 1, // 覆盖叠加层数
+        slideShadows: false // 是否阴影
+      }
+  }); 
+  var swiper = new Swiper('.swiper-container-two',{  // 两个小孩 不开启循环
+      // autoplay: 1000,
+      grabCursor: true,  // 鼠标覆盖Swiper时指针会变成手掌形状，拖动时指针会变成抓手形状
+      pagination:'.swiper-pagination',  // 分页器
+      initialSlide: 1,  // 设定初始化时slide的索引
+      loop: false,  // 开启循环
+      centeredSlides: true,  // 活动块会居中，而不是默认状态下的居左
+      slidesPerView: 'auto',  // 一行显示 slider 的个数
+      effect: 'coverflow',
+      coverflow: {
+        rotate: 0, // 滑动时旋转角度
+        stretch: 0,  // 聚合宽度
+        depth: 300,  // 景深
+        modifier: 1, // 覆盖叠加层数
+        slideShadows: false // 是否阴影
+      }
+  });
+  var swiper = new Swiper('.swiper-container-one',{  // 应用
+      // autoplay: 1000,
+      grabCursor: true,  // 鼠标覆盖Swiper时指针会变成手掌形状，拖动时指针会变成抓手形状
+      pagination:'.swiper-pagination',  // 分页器
+      initialSlide: 1,  // 设定初始化时slide的索引
+      loop: true,  // 开启循环
+      centeredSlides: true,  // 活动块会居中，而不是默认状态下的居左
+      slidesPerView: 'auto',  // 一行显示 slider 的个数
+      effect: 'coverflow',
+      coverflow: {
+        rotate: 0, // 滑动时旋转角度
+        stretch: 0,  // 聚合宽度
+        depth: 300,  // 景深
+        modifier: 1, // 覆盖叠加层数
+        slideShadows: false // 是否阴影
+      }
+  });
+</script>
+</body>
+</html>

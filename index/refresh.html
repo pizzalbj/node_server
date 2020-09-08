@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <title>Document</title>
+    <style type="text/css">
+        html, body, header, p, main, p, span, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+        }
+        .cell {
+            width: 100%;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            background-color: yellow;
+            border-bottom: 1px red solid;
+        }
+        .refresh-bg {
+          box-sizing: border-box;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          width: 100%;
+          height: 80px;
+          line-height: 80px;
+          text-align: center;
+          left: 0;
+          top: 0;
+          transform: translateY(-80px);
+          background-color: #F3F3F3;
+        }
+        .refresh-icon {
+          display: block;
+          width: 1rem;
+          transition: all ease .1s;
+          margin-top: 16px;
+        }
+        .rotate-180 {
+          transform: rotate(180deg);
+          -ms-transform: rotate(180deg);
+          -moz-transform: rotate(180deg);
+          -webkit-transform: rotate(180deg);
+          -o-transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="pullDownRefresh">
+        <!-- 下拉刷新背景 -->
+        <div class="refresh-bg">
+            <img id="refreshPoint" class="refresh-icon" src="/images/arrow_down.png" />
+        </div>
+        <!-- 主体 -->
+        <div id="mainPage" pdr>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <button class="cell" onclick="alert('I am ok')">click me</button>
+            <!-- 注意：scroll 滚动的事件会冒泡 -->
+            <div style="width: 100%;height:200px;background: red;overflow: scroll;" id="scrollParent">
+                <div style="width: 80%;height: 600px;background: green;">
+                    <div>1</div>
+                    <div>11</div>
+                    <div>111</div>
+                    <div>1111</div>
+                    <div>111</div>
+                    <div>11</div>
+                    <div>1</div>
+                    <div>1</div>
+                </div>
+            </div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+            <div class="cell">1</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            // icon动画区域 和 触发下拉刷新的区域
+            let parent = document.querySelector('#pullDownRefresh');
+            // icon动画 区域
+            let refreshPoint = document.querySelector('#refreshPoint');
+            // 触发下拉刷新的区域
+            let mainPage = document.querySelector('#mainPage');
+            // 手指触发屏幕的点
+            let startY = 0;
+            // 滑动的距离
+            let distance = 0;
+            // 用于区分页面内的click事件
+            let isClick = true;
+            // 最后触发的是页面刷新时间 还是 前后端分离的获取数据的方法
+            let locationRefresh = false;
+            // 子元素必须有 pdr="true" 属性才能触发下拉刷新
+            let pageCanRefresh = mainPage.getAttribute("pdr") !== undefined;
+
+            parent.addEventListener('touchstart', function (e) {
+                distance = 0;
+                // 记录手指初触屏幕的位置
+                startY = e.touches[0].pageY;
+            });
+
+            parent.addEventListener('touchmove', function (e) {
+                isClick = false;
+                distance = e.touches[0].pageY - startY;
+                pullDownRefresh(distance, e);
+            });
+
+            parent.addEventListener('touchend', function (e) {
+                if (!isClick && pageCanRefresh) {
+                    goForward(distance);
+                }
+            });
+
+            function pullDownRefresh(d, e) {
+                if (!pageCanRefresh) {
+                    return;
+                }
+                if (isTop() && d > 0) {
+                    d = d > 80 ? 80 : d;
+                    parent.style.transition = "all 0 ease 0";
+                    parent.style.transform = "translateY(" + d + "px)";
+                    if(d > 60) {
+                        refreshPoint.classList.add("rotate-180");
+                    } else {
+                        refreshPoint.classList.remove("rotate-180");
+                    }
+                    if(e !== null && e !== undefined) {
+                        e.preventDefault();
+                    }
+
+                }
+            }
+
+            function goForward(d) {
+                let farEnough = d > 60;
+                parent.style.transition = "all ease 0.3s";
+                if (farEnough) {
+                    // 松开手时的距离已经超过了60，则动画滑动到底部
+                    parent.style.transform = "translateY(80px)";
+                    // 显示 loading
+                    refreshPoint.src = "/images/loading.gif";
+                    // 恢复样式
+                    setTimeout(function(){
+                        if(pageRefresh) {
+                            // 页面刷新
+                            setTimeout(function(){
+                                window.location.reload();
+                            }, 800);
+                        } else {
+                            // 加载更新数据
+                            console.log("getData()");
+                            initStyle();
+                        }
+                    }, 800);
+                } else {
+                    // 未超过60，返回到顶部
+                    parent.style.transform = "translateY(0)";
+                }
+            }
+
+            // 恢复样式
+            function initStyle() {
+                refreshPoint.src = "/images/arrow_down.png";
+                refreshPoint.classList.remove("rotate-180");
+                parent.style.transition = "all ease 0.3s";
+                parent.style.transform = "translateY(0)";
+            }
+
+            // 判断是顶部
+            function isTop() {
+                let t = document.documentElement.scrollTop || document.body.scrollTop;
+                return t === 0;
+            }
+
+            // 被动刷新
+            function refresh() {
+                // 模拟下滑
+                distance = 0;
+                let timer = setInterval(function(){
+                    distance = distance + 1;
+                    pullDownRefresh(distance);
+                    if(distance === 80) {
+                        clearInterval(timer);
+                        document.body.scrollIntoView();
+                        goForward(80);
+                    }
+                }, 6);
+            }
+
+            window.refresh = refresh;
+
+            // 其他内容
+            let flag = false; // 是否滚动
+            let dur = 0; // 触摸时间，太短不触发
+            let date_start, date_end;
+
+            document.querySelector("#scrollParent").addEventListener('touchstart', handler,{ passive: false});
+            document.querySelector("#scrollParent").addEventListener('touchmove', handler,{ passive: false});
+            document.querySelector("#scrollParent").addEventListener('scroll', handler,{ passive: false});
+
+            function handler(e) {
+              switch (e.type) {
+                case 'touchstart':
+                  flag = false;
+                  date_start = new Date();
+                  break;
+                case 'touchmove':
+                  date_end = new Date();
+                  dur = date_end - date_start;
+                  if (flag || dur < 300) {  // 表示是滚动完成后的那个touch不触发/间隔太短
+                    e.stopImmediatePropagation(); // 阻止冒泡
+                  }
+                  break;
+                case 'scroll':
+                  if (!flag) {
+                    flag = true;
+                  }
+                  break;
+              }
+         
+            }
+
+        })
+    </script>
+</body>
+</html>

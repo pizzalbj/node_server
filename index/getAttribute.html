@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信点赞</title>
+    <style></style>
+</head>
+<body>
+    <div data-animal-type="鱼类" data-price="20">金枪鱼</div>
+</body>
+
+<script>
+    var div = document.querySelector("div")
+
+    // 使用setAttribute设置xxx属性
+    div.setAttribute("xxx","abc")
+
+    // 使用dataset设置添加自定义属性yyy(自动添加"data-"前缀)
+    div.dataset.yyy = "def"
+
+    // 使用getAttribute读取自定义属性(不能漏掉"data-"前缀)
+    console.log(div.getAttribute("data-price")) // 20
+
+    // 使用setAttribute修改自定义属性(不能漏掉"data-"前缀)
+    div.setAttribute("data-animal-type","水里游的")
+</script>
+</html>

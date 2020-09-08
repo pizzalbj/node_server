@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+    	/* 暂停按钮。三角形 三个角都是圆角 */
+		.pause {
+		  position: relative;
+		  background-color: rgba(0, 0, 0, .1);
+		}
+
+		.pause::before,
+		.pause::after {
+		  content: '';
+		  position: absolute;
+		  background-color: inherit;
+		}
+
+		.pause,
+		.pause::before,
+		.pause::after {
+		  width: 100px;
+		  height: 100px;
+		  border-top-right-radius: 30%;
+		}
+
+		/* 
+		  rotate(-90deg): 逆时针旋转90度
+		  skewX(-30deg): 水平拉伸30度
+		  scale(1, .866): x轴没有缩放，y轴缩放到0.886。（注意旋转导致的xy轴变化）
+		*/
+		.pause {
+		  transform: rotate(-90deg) skewX(-30deg) scale(1, .866);
+		}
+
+		/*
+		  pause::before 默认继承了pause的所有transform属性值!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+		*/
+		.pause::before {
+		  transform: translate(0, 50px);
+		  /* transform: rotate(-135deg) skewX(-45deg) scale(1.414, .707) translate(0, -50%); */
+		}
+    </style>
+</head>
+<body>
+    <div class="pause"></div>
+</body>
+</html>

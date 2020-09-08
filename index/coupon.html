@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>div 点击</title>
+    <style>
+    	body {
+    		background-color: #FFFFFF;
+    	}
+
+    	.container {
+    		width: 100%;
+    		padding: 20px;
+    		background-color: #DDDDDD;
+    		resize: both; 
+    		overflow: auto;
+    		box-sizing: border-box;
+    	}
+
+    	.base-coupons {
+    		margin: 0 auto;
+		    width: 92%;
+		    max-width: 680px;
+		    height: 120px;
+		    position: relative;
+		    filter: drop-shadow(3px 3px 3px rgba(0,0,0,.3));
+		    background: 
+		    	radial-gradient(circle at right top, transparent 10px,  blue 0) top left / 20% 50% no-repeat,
+		      	radial-gradient(circle at right bottom, transparent 10px,  yellow 0) bottom left / 20% 50% no-repeat,
+		      	radial-gradient(circle at left top, transparent 10px, green 0) top right / 80% 50% no-repeat,
+		      	radial-gradient(circle at left bottom, transparent 10px, white 0) bottom right / 80% 50% no-repeat;
+		      	/* 
+		      		radial-gradient(circle at right top, transparent 20px,  blue 0) top left / 60px 51% no-repeat
+			      		circle at right top: 位置
+			      		transparent: 透明
+			      		20px: 半径
+			      		blue: 背景颜色
+			      		0: 是啥意思?
+			      	top left: 左上块
+			      	80px: X轴的距离
+			      	51%: Y轴的高度
+		      	*/
+		}
+
+		/* 中间的分割线 */
+		.base-coupons::before {
+		    content: '';
+		    height: 80px;
+		    border: 1px dashed #fff;
+		    position: absolute;
+		    left: 20%;
+		    top: 0;
+		    bottom: 0;
+		    margin: auto;
+  		}
+  		
+  		/* 尾部的圈圈 */
+  		.base-coupons::after {
+		    content: '';
+		    position: absolute;
+		    height: 100%;
+		    width:5px;
+		    top: 0;
+		    right: -5px;
+		    background-image: 
+		    	linear-gradient(to bottom, #eeeeee 5px, transparent 5px, transparent),
+		    	radial-gradient(10px circle at 5px 10px, transparent 5px, #eeeeee 5px);
+		    background-size: 5px 15px;
+		}
+
+		.left {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			bottom: 10px;
+			right: calc(80% + 20px);
+			background-color: red;
+		}
+
+		.right {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			left: calc(20% + 10px);
+			bottom: 10px;
+			background-color: red;
+		}
+    </style>
+</head>
+<body>
+	<div class="container">
+	    <div class="base-coupons">
+	    	今天我寒夜里看雪飘过，今天我寒夜里看雪飘过，今天我寒夜里看雪飘过，今天我寒夜里看雪飘过，今天我寒夜里看雪飘过。
+	    </div>
+		<br>
+	    <div class="base-coupons">
+	    	<div class="left">left</div>
+	    	<div class="right">right</div>
+	    </div>
+    </div>
+</body>
+<script>
+</script>
+</html>
