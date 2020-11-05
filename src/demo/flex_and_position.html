@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>遮罩层，上下固定，中间滚动</title>
+    <style>
+        .overlay {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, .5);
+        }
+
+        .overlay .container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 50%;
+            background-color: salmon;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+        }
+
+        .header,
+        .bottom {
+            padding: 20px;
+            background-color: sandybrown;
+        }
+
+        .body {
+            flex-grow: 1;
+            background-color: seagreen;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="toggleOverlay()">显示遮罩层</button>
+    <div id="overlay" class="overlay" hidden="hidden">
+        <div id="container" class="container">
+            <div class="header">header</div>
+            <div class="body">
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+                <h1>body</h1>
+            </div>
+            <div class="bottom">bottom</div>
+        </div>
+    </div>
+</body>
+<script>
+    function toggleOverlay() {
+        var display = document.getElementById("overlay").style.display
+        document.getElementById("overlay").style.display = display != 'block' ? 'block' : 'none'
+    }
+
+    document.getElementById("overlay").addEventListener('click', function () {
+        toggleOverlay()
+    })
+
+    document.getElementById("container").addEventListener("click", function (e) {
+        e.stopPropagation();
+        return false;
+    })
+</script>
+
+</html>

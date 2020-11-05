@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        var person = {}
+        person.name = 'John'
+
+        var father = watchObjChange(person, 'name', function (value) {
+            console.log("father: " + value)
+        })
+
+        var mother = watchObjChange(person, 'name', function (value) {
+            console.log("mother: " + value)
+        })
+
+        // 为何只输出了 mother: new John
+        person.name = "new John"
+
+        function watchObjChange(obj, key, fn) {
+            Object.defineProperty(obj, key, {
+                enumerable: true,
+                configurable: true,
+                set: (val) => {
+                    this._name = val;
+                    fn(val) // setter 里面调用回调函数
+                },
+                get: () => {
+                    return(this._name)
+                }
+            })
+        }
+    </script>
+    <style>
+    </style>
+</body>
+
+</html>
