@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>image to dice</title>
+    <script src="./js/tfjs.js"></script>
+    <script src="./js/tfjs-converter.js"></script>
+    <style type="text/css">
+    .gray {
+        -webkit-filter: grayscale(100%);
+        -moz-filter: grayscale(100%);
+        -ms-filter: grayscale(100%);
+        -o-filter: grayscale(100%);
+        filter: grayscale(100%);
+        filter: gray;
+    }
+    </style>
+</head>
+
+<body>
+    <p>canvas 4 用js处理 骰子。</p>
+    <canvas id="myCanvasDice"></canvas>
+    <button onclick="changeToDice()">变成骰子</button>
+    <p>canvas 3 用js处理 黑白。</p>
+    <canvas id="myCanvasBlackAndWhite"></canvas>
+    <p>canvas 2 用js处理 彩色。用的是下面的用CSS修改过的图片，但是还是彩色</p>
+    <canvas id="myCanvas"></canvas>
+    <p>原图 用css转成黑白</p>
+    <img src="/images/shanzhi.jpeg" class="gray" id="sourdeImage">
+    <p>原图 </p>
+    <img src="/images/shanzhi.jpeg">
+    <script>
+    // 获取原图
+    var sourceImageDom = document.getElementById("sourdeImage")
+    var sourceImageDomHeight = sourceImageDom.height
+    var sourceImageDomWidth = sourceImageDom.width
+
+    // canvas 2 渲染图片
+    var canvas_obj = document.getElementById("myCanvas"); // 获取canvas标签对象
+    canvas_obj.height = sourceImageDomHeight
+    canvas_obj.width = sourceImageDomWidth
+    var ctx = canvas_obj.getContext("2d"); // 设置在画布上绘图的环境
+    ctx.drawImage(sourceImageDom, 0, 0); // 将图片绘制到画布上
+
+    // canvas 3 渲染图片，黑白
+    var imgArrData = ctx.getImageData(0, 0, canvas_obj.width, canvas_obj.height); // 获取画布上的图像像素矩阵
+    ctx.putImageData(imgArrData, 0, 0);
+    for (let i = 0; i < imgArrData.data.length; i += 4) { // js获取图像数据，去除A通道，并转成黑白
+        let r = imgArrData.data[i],
+            g = imgArrData.data[i + 1],
+            b = imgArrData.data[i + 2];
+        const avg = (r + g + b) / 3;
+        imgArrData.data[i] = imgArrData.data[i + 1] = imgArrData.data[i + 2] = avg
+    }
+    var canvas_obj_black_and_white = document.getElementById("myCanvasBlackAndWhite");
+    canvas_obj_black_and_white.height = sourceImageDomHeight
+    canvas_obj_black_and_white.width = sourceImageDomWidth
+    var ctx_black_and_white = canvas_obj_black_and_white.getContext("2d");
+    ctx_black_and_white.drawImage(sourceImageDom, 0, 0); // 将图片绘制到画布上
+    ctx_black_and_white.putImageData(imgArrData, 0, 0)
+    console.log(imgArrData.data)
+
+    // canvas 4 转成 骰子。用到了上面的 imgArrData 数据
+    function changeToDice() {
+        let imgW = sourceImageDomWidth,
+            imgH = sourceImageDomHeight,
+            diceW = 10, // 骰子的长宽
+            canvasDice = document.getElementById("myCanvasDice"),
+            ctxDice = canvasDice.getContext("2d"),
+            verticalNum = parseInt(imgH - diceW), // 垂直方向的 像素个数
+            horizontalNum = parseInt(imgW - diceW); // 水平方向的 像素个数
+        // 设置宽高
+        canvasDice.height = imgH;
+        canvasDice.width = imgW;
+        console.log(imgArrData.data.length, diceW, imgW, imgH, horizontalNum, verticalNum)
+        for (let y = 0; y < verticalNum; y += diceW) {
+            for (let x = 0; x < horizontalNum; x += diceW) {
+                let thisSectorColor = 0;
+                for (let dirX = 0; dirX < diceW; dirX++) {
+                    for (let dirY = 0; dirY < diceW; dirY++) {
+                        // console.log(y, x, dirX, dirY)
+                        thisSectorColor = thisSectorColor + parseInt(ctx_black_and_white.getImageData(x + dirX, y + dirY, 1, 1).data)
+                    }
+                }
+                thisSectorColor = parseInt(thisSectorColor / Math.pow(diceW, 2)) // 骰子里的像素点 取平均
+                // console.log(thisSectorColor)
+                // console.log(x, y, x + diceW, y + diceW)
+
+                // ctxDice.beginPath();
+                // ctxDice.lineWidth = "1";
+                // ctxDice.strokeStyle = "green";
+                // ctxDice.rect(x, y, x + diceW, y + diceW) // 创建矩形
+                // ctxDice.stroke();
+
+                ctxDice.fillStyle = 'rgba(' + thisSectorColor + ',' + thisSectorColor + ',' + thisSectorColor + ',' + 1 + ')'; // 填充颜色
+                ctxDice.fillRect(x, y, x + diceW, y + diceW) // 创建矩形
+                ctxDice.fill(); // 填充
+            }
+        }
+    }
+
+
+
+    // 将js数组转化为tensor数据，并reshape
+    // var imgMat = tf.tensor(imgArr);
+    // var img = imgMat.reshape([1, 448, 448, 3]);
+
+    // const MODEL_URL = './json/web_model/model.json'; // 模型文件名
+    // async function fun() { // 预测函数
+    //     const model = await tf.loadGraphModel(MODEL_URL); // 加载图模型
+    //     console.log(model)
+    //     var predictData = model.predict(img); // 预测
+    //     console.log(predictData.shape);
+    //     predictData.print()
+    // }
+    // fun() // 调用函数
+    </script>
+</body>
+
+</html>

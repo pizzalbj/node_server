@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "type": "module",
+  "desc": "node>14 is not support CommonJs command such as 'require'",
+  "annotation_type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch",

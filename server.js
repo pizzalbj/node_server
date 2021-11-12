@@ -16,6 +16,9 @@ app.use(webpackDevMiddleware(compiler, {
 // 静态文件路径
 app.use(express.static('assets'));
 
+// ‘/lift’路径欧联项目需路径
+app.use(express.static('src/ol-data-monitors'));
+
 // 路径默认'/index'
 // app.get('/', function (req, res) {
 //    res.redirect('/index')
@@ -29,6 +32,11 @@ rf.readdirSync('./src/demo').filter(function (f) {
    app.get('/' + path, function (req, res) {
       res.sendFile(__dirname + "/src/demo/" + path + ".html");
    })
+})
+
+// E电梯项目
+app.get('/lift', function (req, res) {
+   res.sendFile(__dirname + "/src/ol-data-monitors/index.html")
 })
 
 // 使用 nodemon 进行开发自动重启服务
