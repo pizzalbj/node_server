@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>image to dice</title>
+</head>
+
+<body>
+    <div>
+        <canvas id="myCanvasDice"></canvas>
+    </div>
+    <div>
+        <button onclick="changeToDice('黑底白字')">骰子 黑底白字</button>
+        <button onclick="changeToDice('白底黑字')">骰子 白底黑字</button>
+        <input type="number" id="size" min="6" max="20" value="10" placeholder="请输入大小">
+    </div>
+    <div>
+        <!-- multiple="multiple"  -->
+        <input accept="image/png,image/gif,image/jpeg" type="file" onchange="handleFiles(this.files)">
+    </div>
+    <div>
+        <canvas id="myCanvasBlcakAndWhite"></canvas>
+    </div>
+    <div id="preview"></div>
+    <script>
+    let fillImg = null,
+        fillImgZero = new Image(),
+        fillImgOne = new Image(),
+        fillImgTwo = new Image(),
+        fillImgThree = new Image(),
+        fillImgFour = new Image(),
+        fillImgFive = new Image(),
+        fillImgSix = new Image(),
+        fillImgZeroBlack = new Image(),
+        fillImgOneBlack = new Image(),
+        fillImgTwoBlack = new Image(),
+        fillImgThreeBlack = new Image(),
+        fillImgFourBlack = new Image(),
+        fillImgFiveBlack = new Image(),
+        fillImgSixBlack = new Image();
+
+    // 读取的文件
+    let files = [];
+
+    function handleFiles(fs) {
+        let preview = document.getElementById('preview'),
+            url = window.URL || window.webkitURL;
+        for (let f = 0; f < fs.length; f++) {
+            let file = fs[f],
+                imageType = /^image\//;
+
+            if (!imageType.test(file.type)) {
+                continue;
+            }
+
+            let img = document.createElement("img"),
+                div = document.createElement("div");
+            img.file = file;
+            div.appendChild(img);
+            preview.appendChild(div);
+
+            // FileReader接口提供了读取文件的方法和包含读取结果的事件模型
+            let reader = new FileReader();
+            // 把创建的img穿进去，参数为aImg
+            reader.onload = (function(aImg) {
+                return function(e) {
+                    aImg.src = e.target.result;
+                };
+            })(img);
+            // 将文件读取为一段以 data: 开头的字符串，这段字符串的实质就是 Data URL，Data URL 是一种将小文件直接嵌入文档的方案。
+            // 这里的小文件通常是指图像与 html 等格式的文件
+            reader.readAsDataURL(file);
+
+            // 保存读取文件的宽高等信息
+            let image = new Image();
+            img.src = url.createObjectURL(file);
+            img.onload = function() {
+                files.push(this)
+                // 转成黑白
+                let canvasObj = document.getElementById("myCanvasBlcakAndWhite"); // 获取canvas标签对象
+                let ctx = canvasObj.getContext("2d"); // 设置在画布上绘图的环境
+                canvasObj.height = this.height
+                canvasObj.width = this.width
+                ctx.drawImage(this, 0, 0); // 将图片绘制到画布上
+                let imgArrData = ctx.getImageData(0, 0, this.width, this.height); // 获取画布上的图像像素矩阵
+                ctx.putImageData(imgArrData, 0, 0);
+                for (let i = 0; i < imgArrData.data.length; i += 4) { // js获取图像数据，去除A通道，并转成黑白
+                    let r = imgArrData.data[i],
+                        g = imgArrData.data[i + 1],
+                        b = imgArrData.data[i + 2];
+                    const avg = (r + g + b) / 3;
+                    imgArrData.data[i] = imgArrData.data[i + 1] = imgArrData.data[i + 2] = avg
+                }
+                ctx.putImageData(imgArrData, 0, 0)
+            }
+        }
+    }
+
+    function changeToDice(type) {
+        if (files.length == 0) {
+            alert("请选选择图片")
+            return
+        }
+        let canvasObj = document.getElementById("myCanvasBlcakAndWhite"), // 获取canvas标签对象
+            ctx = canvasObj.getContext("2d"),
+            imgW = files[0].width,
+            imgH = files[0].height,
+            diceW = parseInt(document.getElementById("size").value), // 骰子的长宽
+            canvasDice = document.getElementById("myCanvasDice"),
+            ctxDice = canvasDice.getContext("2d"),
+            verticalNum = parseInt(imgH - diceW), // 垂直方向的 像素个数
+            horizontalNum = parseInt(imgW - diceW); // 水平方向的 像素个数
+        // 设置宽高
+        canvasDice.height = imgH;
+        canvasDice.width = imgW;
+        // 阵列化
+        for (let y = 0; y < verticalNum; y += diceW) {
+            for (let x = 0; x < horizontalNum; x += diceW) {
+                let thisSectorColor = 0;
+                for (let dirX = 0; dirX < diceW; dirX++) {
+                    for (let dirY = 0; dirY < diceW; dirY++) {
+                        thisSectorColor = thisSectorColor + parseInt(ctx.getImageData(x + dirX, y + dirY, 1, 1).data)
+                    }
+                }
+                thisSectorColor = parseInt(thisSectorColor / Math.pow(diceW, 2)) 
+                // 填充图片
+                if (thisSectorColor > 219) { // 219
+                    fillImg = type == '黑底白字' ? fillImgZero : fillImgZeroBlack
+                } else if (thisSectorColor > 183) {
+                    fillImg = type == '黑底白字' ? fillImgOne : fillImgOneBlack
+                } else if (thisSectorColor > 146) {
+                    fillImg = type == '黑底白字' ? fillImgTwo : fillImgTwoBlack
+                } else if (thisSectorColor > 110) {
+                    fillImg = type == '黑底白字' ? fillImgThree : fillImgThreeBlack
+                } else if (thisSectorColor > 73) {
+                    fillImg = type == '黑底白字' ? fillImgFour : fillImgFourBlack
+                } else if (thisSectorColor > 37) {
+                    fillImg = type == '黑底白字' ? fillImgFive : fillImgFiveBlack
+                } else if (thisSectorColor > 0) {
+                    fillImg = type == '黑底白字' ? fillImgSix : fillImgSixBlack
+                } else {
+                    fillImg = fillImgZero
+                }
+                ctxDice.drawImage(fillImg, x, y, diceW, diceW);
+            }
+        }
+    }
+    window.onload = function() {
+        // 白底黑字
+        fillImgZero.src = './images/dice/0.jpg';
+        fillImgOne.src = './images/dice/1.jpg';
+        fillImgTwo.src = './images/dice/2.jpg';
+        fillImgThree.src = './images/dice/3.jpg';
+        fillImgFour.src = './images/dice/4.jpg';
+        fillImgFive.src = './images/dice/5.jpg';
+        fillImgSix.src = './images/dice/6.jpg';
+        // 黑底白字
+        fillImgZeroBlack.src = './images/dice/b0.jpg';
+        fillImgOneBlack.src = './images/dice/b1.jpg';
+        fillImgTwoBlack.src = './images/dice/b2.jpg';
+        fillImgThreeBlack.src = './images/dice/b3.jpg';
+        fillImgFourBlack.src = './images/dice/b4.jpg';
+        fillImgFiveBlack.src = './images/dice/b5.jpg';
+        fillImgSixBlack.src = './images/dice/b6.jpg';
+    }
+    </script>
+</body>
+
+</html>

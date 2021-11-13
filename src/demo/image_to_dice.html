@@ -21,7 +21,9 @@
 <body>
     <p>canvas 4 用js处理 骰子。</p>
     <canvas id="myCanvasDice"></canvas>
-    <button onclick="changeToDice()">变成骰子</button>
+    <br>
+    <button onclick="changeToDice('黑白')">黑白</button>
+    <button onclick="changeToDice('骰子')">骰子</button>
     <p>canvas 3 用js处理 黑白。</p>
     <canvas id="myCanvasBlackAndWhite"></canvas>
     <p>canvas 2 用js处理 彩色。用的是下面的用CSS修改过的图片，但是还是彩色</p>
@@ -30,6 +32,7 @@
     <img src="/images/shanzhi.jpeg" class="gray" id="sourdeImage">
     <p>原图 </p>
     <img src="/images/shanzhi.jpeg">
+    <!-- <img src="/images/dice/1.jpg" id="dice"> -->
     <script>
     // 获取原图
     var sourceImageDom = document.getElementById("sourdeImage")
@@ -61,11 +64,37 @@
     ctx_black_and_white.putImageData(imgArrData, 0, 0)
     console.log(imgArrData.data)
 
-    // canvas 4 转成 骰子。用到了上面的 imgArrData 数据
-    function changeToDice() {
+    // canvas 4 转成 骰子
+    let fillImg = null,
+        fillImgZero = new Image(),
+        fillImgOne = new Image(),
+        fillImgTwo = new Image(),
+        fillImgThree = new Image(),
+        fillImgFour = new Image(),
+        fillImgFive = new Image(),
+        fillImgSix = new Image();
+    // 白底黑字
+    // fillImgZero.src = './images/dice/0.jpg';
+    // fillImgOne.src = './images/dice/1.jpg';
+    // fillImgTwo.src = './images/dice/2.jpg';
+    // fillImgThree.src = './images/dice/3.jpg';
+    // fillImgFour.src = './images/dice/4.jpg';
+    // fillImgFive.src = './images/dice/5.jpg';
+    // fillImgSix.src = './images/dice/6.jpg';
+    // 黑底白字
+    fillImgZero.src = './images/dice/b0.jpg';
+    fillImgOne.src = './images/dice/b1.jpg';
+    fillImgTwo.src = './images/dice/b2.jpg';
+    fillImgThree.src = './images/dice/b3.jpg';
+    fillImgFour.src = './images/dice/b4.jpg';
+    fillImgFive.src = './images/dice/b5.jpg';
+    fillImgSix.src = './images/dice/b6.jpg';
+    
+
+    function changeToDice(type) {
         let imgW = sourceImageDomWidth,
             imgH = sourceImageDomHeight,
-            diceW = 10, // 骰子的长宽
+            diceW = 6, // 骰子的长宽
             canvasDice = document.getElementById("myCanvasDice"),
             ctxDice = canvasDice.getContext("2d"),
             verticalNum = parseInt(imgH - diceW), // 垂直方向的 像素个数
@@ -73,7 +102,7 @@
         // 设置宽高
         canvasDice.height = imgH;
         canvasDice.width = imgW;
-        console.log(imgArrData.data.length, diceW, imgW, imgH, horizontalNum, verticalNum)
+        // console.log(imgArrData.data.length, diceW, imgW, imgH, horizontalNum, verticalNum)
         for (let y = 0; y < verticalNum; y += diceW) {
             for (let x = 0; x < horizontalNum; x += diceW) {
                 let thisSectorColor = 0;
@@ -83,19 +112,46 @@
                         thisSectorColor = thisSectorColor + parseInt(ctx_black_and_white.getImageData(x + dirX, y + dirY, 1, 1).data)
                     }
                 }
-                thisSectorColor = parseInt(thisSectorColor / Math.pow(diceW, 2)) // 骰子里的像素点 取平均
-                // console.log(thisSectorColor)
+
                 // console.log(x, y, x + diceW, y + diceW)
 
+                thisSectorColor = parseInt(thisSectorColor / Math.pow(diceW, 2)) // 骰子里的像素点 取平均
+                // console.log(thisSectorColor)
+
+                // 边框
                 // ctxDice.beginPath();
                 // ctxDice.lineWidth = "1";
                 // ctxDice.strokeStyle = "green";
                 // ctxDice.rect(x, y, x + diceW, y + diceW) // 创建矩形
                 // ctxDice.stroke();
 
-                ctxDice.fillStyle = 'rgba(' + thisSectorColor + ',' + thisSectorColor + ',' + thisSectorColor + ',' + 1 + ')'; // 填充颜色
-                ctxDice.fillRect(x, y, x + diceW, y + diceW) // 创建矩形
-                ctxDice.fill(); // 填充
+                if (type == '黑白') {
+                    // 填充颜色
+                    ctxDice.fillStyle = 'rgba(' + thisSectorColor + ',' + thisSectorColor + ',' + thisSectorColor + ',' + 1 + ')'; // 填充颜色
+                    ctxDice.fillRect(x, y, x + diceW, y + diceW) // 创建矩形
+                    ctxDice.fill(); // 填充
+                } else if (type == '骰子') {
+                    // 填充图片
+                    if (thisSectorColor > 219) { // 219
+                        fillImg = fillImgZero
+                    } else if (thisSectorColor > 183) {
+                        fillImg = fillImgZero
+                        // fillImg = fillImgOne
+                    } else if (thisSectorColor > 146) {
+                        fillImg = fillImgTwo
+                    } else if (thisSectorColor > 110) {
+                        fillImg = fillImgThree
+                    } else if (thisSectorColor > 73) {
+                        fillImg = fillImgFour
+                    } else if (thisSectorColor > 37) {
+                        fillImg = fillImgFive
+                    } else if (thisSectorColor > 0) {
+                        fillImg = fillImgSix
+                    } else {
+                        fillImg = fillImgZero
+                    }
+                    ctxDice.drawImage(fillImg, x, y, diceW, diceW);
+                }
             }
         }
     }
