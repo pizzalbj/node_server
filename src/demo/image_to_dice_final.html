@@ -8,20 +8,34 @@
 
 <body>
     <div>
-        <canvas id="myCanvasDice"></canvas>
+        <span id="num"></span>
     </div>
     <div>
+        <p>格式化图片</p>
+        <canvas id="myCanvasDice" style="border: 1px solid #cdcdcd; padding: 2px;"></canvas>
+        <a id="download">下载图片</a>
+    </div>
+    <div id="myCanvasshowAll"></div>
+    <br />
+    <div>
+        <button onclick="changeToDice('黑白')">格式化 黑白</button>
+        <button onclick="changeToDice('彩色')">格式化 彩色</button>
         <button onclick="changeToDice('黑底白字')">骰子 黑底白字</button>
         <button onclick="changeToDice('白底黑字')">骰子 白底黑字</button>
-        <input type="number" id="size" min="6" max="20" value="10" placeholder="请输入大小">
     </div>
+    <br />
+    <div>格栅大小/1-12：<input type="number" id="size" min="1" max="12" value="6" placeholder="请输入大小" /></div>
+    <div>颜色深浅/越大越深/0.1-2：<input type="number" id="contrast" min="0.1" step="0.1" max="2" value="1" placeholder="请选择颜色平均值" /></div>
+    <div>对比度/颜色向两边分布/0否1是？：<input type="number" id="bothSides" min="0" step="1" max="1" value="0" placeholder="请选择是否向两边分布颜色" /></div>
+    <div>纯面/6没有-7有：<input type="number" id="part" min="4" step="1" max="8" value="6" placeholder="份数" /></div>
+    <div><label>请请请！！！先 </label><input accept="image/png,image/jpg,image/jpeg" type="file" onchange="handleFiles(this.files)" /></div>
     <div>
-        <!-- multiple="multiple"  -->
-        <input accept="image/png,image/gif,image/jpeg" type="file" onchange="handleFiles(this.files)">
-    </div>
-    <div>
+        <p>Canvas 彩色 没有格式化</p>
+        <canvas id="myCanvasColor"></canvas>
+        <p>Canvas 黑白 没有格式化</p>
         <canvas id="myCanvasBlcakAndWhite"></canvas>
     </div>
+    <p>原图</p>
     <div id="preview"></div>
     <script>
     let fillImg = null,
@@ -43,6 +57,17 @@
     // 读取的文件
     let files = [];
 
+    document.getElementById('download').addEventListener('click', function() {
+        console.log("lalal")
+        downloadCanvas(this, 'myCanvasDice', 'kobe.png');
+    }, false);
+
+    function downloadCanvas(link, canvasId, filename) {
+        link.href = document.getElementById(canvasId).toDataURL();
+        console.log(link)
+        link.download = filename;
+    }
+
     function handleFiles(fs) {
         let preview = document.getElementById('preview'),
             url = window.URL || window.webkitURL;
@@ -58,6 +83,7 @@
                 div = document.createElement("div");
             img.file = file;
             div.appendChild(img);
+            preview.innerHTML = "";
             preview.appendChild(div);
 
             // FileReader接口提供了读取文件的方法和包含读取结果的事件模型
@@ -76,23 +102,31 @@
             let image = new Image();
             img.src = url.createObjectURL(file);
             img.onload = function() {
+                files = []
                 files.push(this)
-                // 转成黑白
-                let canvasObj = document.getElementById("myCanvasBlcakAndWhite"); // 获取canvas标签对象
-                let ctx = canvasObj.getContext("2d"); // 设置在画布上绘图的环境
-                canvasObj.height = this.height
-                canvasObj.width = this.width
-                ctx.drawImage(this, 0, 0); // 将图片绘制到画布上
-                let imgArrData = ctx.getImageData(0, 0, this.width, this.height); // 获取画布上的图像像素矩阵
-                ctx.putImageData(imgArrData, 0, 0);
-                for (let i = 0; i < imgArrData.data.length; i += 4) { // js获取图像数据，去除A通道，并转成黑白
-                    let r = imgArrData.data[i],
-                        g = imgArrData.data[i + 1],
-                        b = imgArrData.data[i + 2];
+                // Canvas 彩色
+                let canvasColor = document.getElementById("myCanvasColor"), // 获取canvas标签对象
+                    ctxColor = canvasColor.getContext("2d"); // 设置在画布上绘图的环境
+                canvasColor.height = this.height
+                canvasColor.width = this.width
+                ctxColor.drawImage(this, 0, 0); // 将图片绘制到画布上
+                let imgArrDataColor = ctxColor.getImageData(0, 0, this.width, this.height); // 获取画布上的图像像素矩阵
+                ctxColor.putImageData(imgArrDataColor, 0, 0);
+                // Canvas 黑白
+                let canvasBlcakAndWhite = document.getElementById("myCanvasBlcakAndWhite"), // 获取canvas标签对象
+                    ctxBlcakAndWhite = canvasBlcakAndWhite.getContext("2d"); // 设置在画布上绘图的环境
+                canvasBlcakAndWhite.height = this.height
+                canvasBlcakAndWhite.width = this.width
+                ctxBlcakAndWhite.drawImage(this, 0, 0); // 将图片绘制到画布上
+                let imgArrDataBlcakAndWhite = ctxBlcakAndWhite.getImageData(0, 0, this.width, this.height); // 获取画布上的图像像素矩阵
+                for (let i = 0; i < imgArrDataBlcakAndWhite.data.length; i += 4) { // js获取图像数据，去除A通道
+                    let r = imgArrDataBlcakAndWhite.data[i],
+                        g = imgArrDataBlcakAndWhite.data[i + 1],
+                        b = imgArrDataBlcakAndWhite.data[i + 2];
                     const avg = (r + g + b) / 3;
-                    imgArrData.data[i] = imgArrData.data[i + 1] = imgArrData.data[i + 2] = avg
+                    imgArrDataBlcakAndWhite.data[i] = imgArrDataBlcakAndWhite.data[i + 1] = imgArrDataBlcakAndWhite.data[i + 2] = avg
                 }
-                ctx.putImageData(imgArrData, 0, 0)
+                ctxBlcakAndWhite.putImageData(imgArrDataBlcakAndWhite, 0, 0)
             }
         }
     }
@@ -102,50 +136,125 @@
             alert("请选选择图片")
             return
         }
-        let canvasObj = document.getElementById("myCanvasBlcakAndWhite"), // 获取canvas标签对象
-            ctx = canvasObj.getContext("2d"),
+        let canvasBlcakAndWhite = document.getElementById("myCanvasBlcakAndWhite"), // 获取 canvas 标签对象
+            ctxBlcakAndWhite = canvasBlcakAndWhite.getContext("2d"),
+            canvasColor = document.getElementById("myCanvasColor"),
+            ctxColor = canvasColor.getContext("2d"),
             imgW = files[0].width,
             imgH = files[0].height,
             diceW = parseInt(document.getElementById("size").value), // 骰子的长宽
             canvasDice = document.getElementById("myCanvasDice"),
             ctxDice = canvasDice.getContext("2d"),
             verticalNum = parseInt(imgH - diceW), // 垂直方向的 像素个数
-            horizontalNum = parseInt(imgW - diceW); // 水平方向的 像素个数
+            horizontalNum = parseInt(imgW - diceW), // 水平方向的 像素个数
+            num = 0, // 记录个数
+            xNum = 0,
+            yNum = 0,
+            contrast = parseInt(document.getElementById("contrast").value),
+            part = parseInt(document.getElementById("part").value),
+            bothSides = parseInt(document.getElementById("bothSides").value);
         // 设置宽高
         canvasDice.height = imgH;
         canvasDice.width = imgW;
         // 阵列化
         for (let y = 0; y < verticalNum; y += diceW) {
+            yNum = yNum + 1
             for (let x = 0; x < horizontalNum; x += diceW) {
-                let thisSectorColor = 0;
+                if (y == 0) { // 确保不多次记录
+                    xNum = xNum + 1
+                }
+                num = num + 1
+                let temp = 0,
+                    thisSectorColor = 0,
+                    rColor = 0,
+                    gColor = 0,
+                    bColor = 0,
+                    canvasChange = type == '黑白' ? ctxBlcakAndWhite : ctxColor;
                 for (let dirX = 0; dirX < diceW; dirX++) {
                     for (let dirY = 0; dirY < diceW; dirY++) {
-                        thisSectorColor = thisSectorColor + parseInt(ctx.getImageData(x + dirX, y + dirY, 1, 1).data)
+                        temp = canvasChange.getImageData(x + dirX, y + dirY, 1, 1).data;
+                        thisSectorColor = thisSectorColor + parseInt(temp) // parseInt(temp): Uint8ClampedArray => int
+                        rColor = rColor + temp[0]; // r 求和
+                        gColor = gColor + temp[1]; // g 求和
+                        bColor = bColor + temp[2]; // b 求和
                     }
                 }
-                thisSectorColor = parseInt(thisSectorColor / Math.pow(diceW, 2)) 
-                // 填充图片
-                if (thisSectorColor > 219) { // 219
-                    fillImg = type == '黑底白字' ? fillImgZero : fillImgZeroBlack
-                } else if (thisSectorColor > 183) {
-                    fillImg = type == '黑底白字' ? fillImgOne : fillImgOneBlack
-                } else if (thisSectorColor > 146) {
-                    fillImg = type == '黑底白字' ? fillImgTwo : fillImgTwoBlack
-                } else if (thisSectorColor > 110) {
-                    fillImg = type == '黑底白字' ? fillImgThree : fillImgThreeBlack
-                } else if (thisSectorColor > 73) {
-                    fillImg = type == '黑底白字' ? fillImgFour : fillImgFourBlack
-                } else if (thisSectorColor > 37) {
-                    fillImg = type == '黑底白字' ? fillImgFive : fillImgFiveBlack
-                } else if (thisSectorColor > 0) {
-                    fillImg = type == '黑底白字' ? fillImgSix : fillImgSixBlack
-                } else {
-                    fillImg = fillImgZero
+                // 取平均值
+                thisSectorColor = parseInt(thisSectorColor / (Math.pow(diceW, 2) / 1 * contrast));
+                rColor = parseInt(rColor / (Math.pow(diceW, 2) / 1 * contrast));
+                gColor = parseInt(gColor / (Math.pow(diceW, 2) / 1 * contrast));
+                bColor = parseInt(bColor / (Math.pow(diceW, 2) / 1 * contrast));
+                if (type == '黑白') { // 填充颜色
+                    let color = thisSectorColor
+                    ctxDice.fillStyle = 'rgba(' + color + ',' + color + ',' + color + ',' + 1 + ')'; // 填充颜色
+                    ctxDice.fillRect(x, y, x + diceW, y + diceW) // 创建矩形
+                    ctxDice.fill(); // 填充
+                } else if (type == '彩色') { // 填充颜色
+                    // console.log('rgba(' + rColor + ',' + gColor + ',' + bColor + ',' + 1 + ')')
+                    ctxDice.fillStyle = 'rgba(' + rColor + ',' + gColor + ',' + bColor + ',' + 1 + ')'; // 填充颜色
+                    ctxDice.fillRect(x, y, x + diceW, y + diceW) // 创建矩形
+                    ctxDice.fill(); // 填充
+                } else { // 填充图片
+                    if (thisSectorColor > (255 / part) * (part - 1)) {
+                        if (part == 6) {
+                            fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
+                        } else if (part == 7) {
+                            fillImg = type != '黑底白字' ? fillImgZero : fillImgZeroBlack
+                        }
+                    } else if (thisSectorColor > (255 / part) * (part - 2)) {
+                        if (part == 6) {
+                            // fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
+                            console.log(Boolean(bothSides))
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack)  // 变浅。6的第二
+                        } else if (part == 7) {
+                            // fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgZero : fillImgOne) : (bothSides ? fillImgZeroBlack : fillImgOneBlack)  // 变浅。7的第二
+                        }
+
+                    } else if (thisSectorColor > (255 / part) * (part - 3)) {
+                        if (part == 6) {
+                            // fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                            fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                        } else if (part == 7) {
+                            fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
+                        }
+                    } else if (thisSectorColor > (255 / part) * (part - 4)) {
+                        if (part == 6) {
+                            fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                        } else if (part == 7) {
+                            fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                        }
+
+                    } else if (thisSectorColor > (255 / part) * (part - 5)) {
+                        if (part == 6) {
+                            // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack)  // 变深。6的倒数第二
+                        } else if (part == 7) {
+                            fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                        }
+                    } else if (thisSectorColor > (255 / part) * (part - 6)) {
+                        if (part == 6) {
+                            fillImg = type != '黑底白字' ? fillImgSix : fillImgSixBlack
+                        } else if (part == 7) {
+                            // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack)  // 变深。7的倒数第二
+                        }
+                    } else if (thisSectorColor > (255 / part) * (part - 7)) {
+                        if (part == 7) {
+                            fillImg = type != '黑底白字' ? fillImgSix : fillImgSixBlack
+                        }
+                    }
+                    ctxDice.drawImage(fillImg, x, y, diceW, diceW);
                 }
-                ctxDice.drawImage(fillImg, x, y, diceW, diceW);
             }
         }
+        document.getElementById("num").innerHTML = num + "格 X:" + xNum + "格 Y:" + yNum + "格 " +
+            "<div style='color: blue'>12MM骰子" + " 长" + (xNum * 1.2).toFixed(2) + "cm" + " 高" + (yNum * 1.2).toFixed(2) + "cm</div>" +
+            "<div style='color:green'>10MM骰子" + " 长" + (xNum * 1).toFixed(2) + "cm" + " 高" + (yNum * 1).toFixed(2) + "cm</div>" +
+            "<div style='color: blue'>8MM骰子" + " 长" + (xNum * 0.8).toFixed(2) + "cm" + " 高" + (yNum * 0.8).toFixed(2) + "cm</div>" +
+            "<div style='color:green'>5MM骰子" + " 长" + (xNum * 0.5).toFixed(2) + "cm" + " 高" + (yNum * 0.5).toFixed(2) + "cm</div>";
     }
+
     window.onload = function() {
         // 白底黑字
         fillImgZero.src = './images/dice/0.jpg';
