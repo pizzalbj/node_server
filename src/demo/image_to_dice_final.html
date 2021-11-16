@@ -12,7 +12,7 @@
     </div>
     <div>
         <p>格式化图片</p>
-        <canvas id="myCanvasDice" style="border: 1px solid #cdcdcd; padding: 2px;"></canvas>
+        <canvas id="myCanvasDice" style="border: 1px solid blue;"></canvas>
         <a id="download">下载图片</a>
     </div>
     <div id="myCanvasshowAll"></div>
@@ -24,7 +24,7 @@
         <button onclick="changeToDice('白底黑字')">骰子 白底黑字</button>
     </div>
     <br />
-    <div>格栅大小/1-12：<input type="number" id="size" min="1" max="12" value="6" placeholder="请输入大小" /></div>
+    <div>格栅大小/1-12：<input type="number" id="size" min="1" max="12" value="8" placeholder="请输入大小" /></div>
     <div>颜色深浅/越大越深/0.1-2：<input type="number" id="contrast" min="0.1" step="0.1" max="2" value="1" placeholder="请选择颜色平均值" /></div>
     <div>对比度/颜色向两边分布/0否1是？：<input type="number" id="bothSides" min="0" step="1" max="1" value="0" placeholder="请选择是否向两边分布颜色" /></div>
     <div>纯面/6没有-7有：<input type="number" id="part" min="4" step="1" max="8" value="6" placeholder="份数" /></div>
@@ -140,29 +140,40 @@
             ctxBlcakAndWhite = canvasBlcakAndWhite.getContext("2d"),
             canvasColor = document.getElementById("myCanvasColor"),
             ctxColor = canvasColor.getContext("2d"),
-            imgW = files[0].width,
-            imgH = files[0].height,
+            imgW = files[0].width + 1,
+            imgH = files[0].height + 1,
             diceW = parseInt(document.getElementById("size").value), // 骰子的长宽
             canvasDice = document.getElementById("myCanvasDice"),
             ctxDice = canvasDice.getContext("2d"),
             verticalNum = parseInt(imgH - diceW), // 垂直方向的 像素个数
             horizontalNum = parseInt(imgW - diceW), // 水平方向的 像素个数
+            // verticalNum = imgH, // 垂直方向的 像素个数
+            // horizontalNum = imgW, // 水平方向的 像素个数
             num = 0, // 记录个数
-            xNum = 0,
-            yNum = 0,
+            yNum = parseInt((verticalNum / diceW).toFixed(0)),
+            xNum = parseInt((horizontalNum / diceW).toFixed(0)),
+            yIndex = 0,
+            xIndex = 0,
             contrast = parseInt(document.getElementById("contrast").value),
             part = parseInt(document.getElementById("part").value),
             bothSides = parseInt(document.getElementById("bothSides").value);
         // 设置宽高
-        canvasDice.height = imgH;
-        canvasDice.width = imgW;
+        canvasDice.height = imgH + diceW * 3;
+        canvasDice.width = imgW + diceW * 2;
+        // 定义字符
+        ctxDice.font = diceW + 'px 微软雅黑';
+        for (let y = 0; y < verticalNum; y += diceW) { // 序号，垂直方向
+            ctxDice.fillText(yIndex, horizontalNum + diceW, y + diceW); // y + diceW ?????????????????????????
+            yIndex = yIndex + 1
+        }
+        for (let x = 0; x < horizontalNum; x += diceW) { // 序号，水平方向
+            let xIndexTemp = parseInt(xIndex % 10);
+            ctxDice.fillText(xIndexTemp, x + 1, verticalNum + diceW); // x + 1 文字可以居中一点
+            xIndex = xIndex + 1
+        }
         // 阵列化
         for (let y = 0; y < verticalNum; y += diceW) {
-            yNum = yNum + 1
             for (let x = 0; x < horizontalNum; x += diceW) {
-                if (y == 0) { // 确保不多次记录
-                    xNum = xNum + 1
-                }
                 num = num + 1
                 let temp = 0,
                     thisSectorColor = 0,
@@ -180,10 +191,10 @@
                     }
                 }
                 // 取平均值
-                thisSectorColor = parseInt(thisSectorColor / (Math.pow(diceW, 2) / 1 * contrast));
-                rColor = parseInt(rColor / (Math.pow(diceW, 2) / 1 * contrast));
-                gColor = parseInt(gColor / (Math.pow(diceW, 2) / 1 * contrast));
-                bColor = parseInt(bColor / (Math.pow(diceW, 2) / 1 * contrast));
+                thisSectorColor = parseInt(thisSectorColor / (Math.pow(diceW, 2) / (1 * contrast)));
+                rColor = parseInt(rColor / (Math.pow(diceW, 2) / (1 * contrast)));
+                gColor = parseInt(gColor / (Math.pow(diceW, 2) / (1 * contrast)));
+                bColor = parseInt(bColor / (Math.pow(diceW, 2) / (1 * contrast)));
                 if (type == '黑白') { // 填充颜色
                     let color = thisSectorColor
                     ctxDice.fillStyle = 'rgba(' + color + ',' + color + ',' + color + ',' + 1 + ')'; // 填充颜色
@@ -204,23 +215,24 @@
                     } else if (thisSectorColor > (255 / part) * (part - 2)) {
                         if (part == 6) {
                             // fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
-                            console.log(Boolean(bothSides))
-                            fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack)  // 变浅。6的第二
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack) // 变浅 2转1。6的第二个
                         } else if (part == 7) {
                             // fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
-                            fillImg = type != '黑底白字' ? (bothSides ? fillImgZero : fillImgOne) : (bothSides ? fillImgZeroBlack : fillImgOneBlack)  // 变浅。7的第二
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgZero : fillImgOne) : (bothSides ? fillImgZeroBlack : fillImgOneBlack) // 变浅 1转0。7的第二个
                         }
 
                     } else if (thisSectorColor > (255 / part) * (part - 3)) {
                         if (part == 6) {
-                            // fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
                             fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                            // fillImg = type != '黑底白字' ? (bothSides ? fillImgTwo : fillImgThree) : (bothSides ? fillImgTwoBlack : fillImgThreeBlack) // 变浅 3转2。6的第三个
                         } else if (part == 7) {
                             fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
+                            // fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack) // 变浅 2转1。7的第三个
                         }
                     } else if (thisSectorColor > (255 / part) * (part - 4)) {
                         if (part == 6) {
                             fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                            // fillImg = type != '黑底白字' ? (bothSides ? fillImgFive : fillImgFour) : (bothSides ? fillImgFiveBlack : fillImgFourBlack) // 变深 4转5。6的倒数第三个
                         } else if (part == 7) {
                             fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
                         }
@@ -228,16 +240,17 @@
                     } else if (thisSectorColor > (255 / part) * (part - 5)) {
                         if (part == 6) {
                             // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
-                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack)  // 变深。6的倒数第二
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack) // 变深 5转6。6的倒数第二个
                         } else if (part == 7) {
                             fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                            // fillImg = type != '黑底白字' ? bothSides ? fillImgFive : fillImgFour : bothSides ? fillImgFiveBlack : fillImgFourBlack // 变深 4转5。7的倒数第三个
                         }
                     } else if (thisSectorColor > (255 / part) * (part - 6)) {
                         if (part == 6) {
                             fillImg = type != '黑底白字' ? fillImgSix : fillImgSixBlack
                         } else if (part == 7) {
                             // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
-                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack)  // 变深。7的倒数第二
+                            fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack) // 变深 5转6。7的倒数第二个
                         }
                     } else if (thisSectorColor > (255 / part) * (part - 7)) {
                         if (part == 7) {
