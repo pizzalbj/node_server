@@ -1,0 +1,43 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <!-- node express 配置了 静态资源路径为 /assets -->
+    <script src="js/vue.js"></script>
+</head>
+<body>
+<div id="app">
+  Vue vue vue vue
+  <div>{{message}}</div>
+  <div class="btn-circle" @click="jsAlert">js-alert</div>
+</div>
+<script>
+    new Vue({
+      el: '#app',
+      data() {
+        return {
+          message: 'helloMessage'
+        }
+      },
+      methods: {
+        jsAlert() {
+          alert("Js 代码调用 Js代码");
+        },
+        callJS() {
+          alert("Android调用了JS的callJS方法");
+        }
+      },
+    })
+</script>
+<style>
+  .btn-circle {
+    width: 88px;
+    height: 88px;
+    background: yellow;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+</body>
+</html>

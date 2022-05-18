@@ -1,0 +1,198 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <!-- node express 配置了 静态资源路径为 /assets -->
+    <!-- <script src="js/jquery.js"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- 获取图片 -->
+    <p><input placeholder="请复制拷贝asin页面的源代码" id="asin" value=""
+            style="display: block; width: 300px; height: 100px;"></input></p>
+    <p><button onclick="getPic()">获取图片</button></p>
+
+    <!-- Refused to display 'https://www.amazon.com/' in a frame because it set 'X-Fr -->
+    <!-- <iframe id="foo" src="https://www.amazon.com/dp/B072JKCL7D"></iframe> -->
+    <!-- <p><iframe id="foo"></iframe></p> -->
+
+    <!-- <p style="display: block; width: 100px; height:100px;">
+        <a id="getImg" href="" download="">点击下载图片</a>
+    </p>
+
+    <p>
+        <img style="width: 300px;height: 300px;"
+            src="https://wallpaper-static.cheetahfun.com/wallpaper/sites/beauty/pic1.jpg" width="90%" id="testImg">
+    </p> -->
+
+
+    <!-- 格式化表格数据 -->
+    <p><textarea placeholder="请输入复制的表格数据" id="items" value=""
+            style="display: block; width: 600px; height: 600px;"></textarea></p>
+    <p><button onclick="formatItems()">格式化</button></p>
+    <div id="itemsOutput"></div>
+    <script>
+        function getPic() {
+
+            // 公用对象
+            let sourceCode = document.getElementById("asin").value;
+            let iframe = document.getElementById('foo');
+
+            // 方法1：正则全局 找出来。需要在input里输入 asin页面的源代码。
+            // http://www.manongjc.com/detail/23-kkhviowfugutqkt.html https://blog.csdn.net/z591102/article/details/107782830
+            // 解析：/***/g，就是格式。
+            // 解析：https:\/\/m.media-amazon.com\/images\/ 为首。 "/" 符号需要 \符号 转义。
+            // 解析：.*?为中间的操作符。. 元字符用于查找单个字符（除换行符和其他Unicode行终止符之外的任意字符）、"*"表示{0,}，”{}"表示重复上一项，{0,}表示至少0次、"?"表示{0,1}至少0次，至多一次。
+            // 解析：https://zhidao.baidu.com/question/277875624.html
+            // 表达式 .* 就是单个字符匹配任意次，即贪婪匹配。 表达式 .*? 是满足条件的情况只匹配一次，即最小匹配.
+            // 解析：\.jpg 为尾。 "." 符号需要 \符号 转义。
+            // 查找 https://m.media-amazon.com/image/***.jpg 的图片 url 集合。实在太多了！！！！
+            // let re = /https:\/\/m.media-amazon.com\/images\/.*?\.jpg/g; 
+            // 查找 "hiRes":"https://m.media-amazon.com/images/I/71Q2PjF4t7L._AC_SL1500_.jpg", 的图片 url 集合。"hiRes":***.jpg // hiRes 就是高清原图。用这个！！！
+            let re = /"hiRes":.*?\.jpg/g;
+            let imgArr = sourceCode.match(re);
+            let a = document.getElementById('getImg'); // 获取dom
+            // let event = new MouseEvent('click'); // 模拟鼠标click点击事件
+            for (let i = 0; i < imgArr.length; i++) {
+                // 下载方法1：会跳转不下载
+                // a.download = i + ".jpg"; // 设置a节点的download属性值
+                // a.href = imgArr[i].substring(9) + '?response-content-type=application/octet-stream'; // 将图片的src赋值给a节点的href
+                // console.log(imgArr[i].substring(9))
+                // a.dispatchEvent(event); // 触发鼠标点击事件
+                // a.click();
+
+                // 下载方法2：加了也不行
+                // var img = document.getElementById("testImg");
+                // var alink = document.createElement("a");
+                // alink.href = imgArr[i].substring(9) + '?response-content-type=application/octet-stream';
+                // alink.click();
+
+                // 下载方法3：可以
+                DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg")
+            }
+
+            // 方法2：iframe 里用jq查找。需要在input里输入 asin页面的源代码。
+            // var iframe = document.getElementById('foo'),
+            //     iframedoc = iframe.contentDocument || iframe.contentWindow.document;
+            // iframedoc.body.innerHTML = sourceCode;
+            // console.log($("#foo"));
+            // var a = $("#foo").contents().find(".imgTagWrapper");
+            // console.log(a);
+
+            // 方法3：iframe 里用jq查找。需要在input里输入 asin，拼接 iframe 的 url。
+            // 最后发现：Refused to display 'https://www.amazon.com/' in a frame because it set 'X-Fr
+            // iframe.src = "https://www.amazon.com/dp/B072JKCL7D";
+
+            // 方法4：js 跨域问题解决不了
+            // console.log("asin: " + asin);
+            // if (asin.length == 10) {
+            //     // var amazonUrl = "https://www.amazon.com/dp/" + asin;
+            //     var amazonUrl = "https://www.baidu.com";
+            //     // var myURL = new URL(amazonUrl);
+            //     // console.log(myURL);
+            //     $.ajax({
+            //         async: false,
+            //         type: 'get',
+            //         url: amazonUrl,
+            //         dataType: 'jsonp',
+            //         jsonp: 'jsoncallback',
+            //         timeout: 5000,
+            //         crossDomain: true,
+            //         beforeSend: function () {
+            //             //jsonp 方式此方法不被触发.原因可能是dataType如果指定为jsonp的话,就已经不是ajax事件了
+            //         },
+            //         success: function (body, heads, status) {
+            //             console.log(body);  //body就是内容了，也就是url网页中的内容
+            //         }
+            //     });
+            //     // fetch(amazonUrl).then(function(e){
+            //     //     console.log(e);
+            //     // })
+            // } else {
+            //     alert("asin 有误")
+            // }
+        }
+        function DOWLOAD_FILE(url, fileName) {
+            fetch(url).then(res => res.blob().then(blob => {
+                var a = document.createElement('a')
+                a.href = window.URL.createObjectURL(blob)
+                a.download = fileName
+                a.click()
+                window.URL.revokeObjectURL(url)
+            }))
+        }
+
+        function formatItems() {
+            // 公用对象。
+            // 注意这里有换行，不能用input 组件，要用 textarea组件
+            let sourceCode = document.getElementById("items").value;
+            // 转成数组，字符串for循环不行
+            sourceCode = sourceCode.split("");
+
+            // 一些编码
+            // 空格：9、20
+            // 0x200e：200e
+            // 换行：a
+            let item = "", code = "";
+            for (let i = 0; i < sourceCode.length; i++) {
+                item = sourceCode[i];
+                itemNext = sourceCode[i + 1];
+                if (item !== undefined) code = item.charCodeAt(0).toString(16);
+                if (itemNext !== undefined) codeNext = itemNext.charCodeAt(0).toString(16);
+
+                // 第一个字符前添加<p><strong>
+                if (i === 0) {
+                    sourceCode[i] = "<p><strong>" + sourceCode[i]; // 不能用item
+                }
+
+                // 中间替换
+                if ((code == "9" || code == "20") && codeNext == "200e") {
+                    sourceCode[i] = ":" // 不能用item
+                    sourceCode[i + 1] = "</strong>" // 不能用item
+                    i = i + 1
+                }
+
+                // 换行替换
+                if(code == "a") {
+                    sourceCode[i + 1] = "<p><strong>" + sourceCode[i + 1] // 不能用item
+                    i = i + 1
+                }
+
+                // console.log("item: " + item)
+                // console.log(item.charAt())
+                // console.log(item.charCodeAt().toString(16))
+                // console.log(item.charCodeAt(0).toString(16))
+                // console.log(item.codePointAt().toString(16))
+            }
+            document.getElementById("items").value = sourceCode.join("")
+        }
+
+        !function () {
+            let c = "ccccc";
+            for (let y = 0; y < c.length; y++) {
+                c[y] = "D";
+                // console.log(c[y]); // 总是 c
+                // console.log(c) // 总是 ccccc 
+            }
+
+            let d = [1, 2, 3, 4];
+            for (let z = 0; z < d.length; z++) {
+                d[z] = "F";
+                // console.log(d[z]);
+                // console.log(d)
+            }
+
+            // var arr = ['sun', 'moon', 'start']
+            // console.log(arr.join("")) // 'sun, moon, star
+        }();
+    </script>
+
+
+    <style>
+    </style>
+</body>
+
+</html>

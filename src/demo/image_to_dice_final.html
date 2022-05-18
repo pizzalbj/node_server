@@ -77,7 +77,8 @@
             fillImgThreeBlack = new Image(),
             fillImgFourBlack = new Image(),
             fillImgFiveBlack = new Image(),
-            fillImgSixBlack = new Image();
+            fillImgSixBlack = new Image(),
+            fileName = "";
 
         // 读取的文件
         let files = [];
@@ -86,8 +87,11 @@
             let preview = document.getElementById('preview'),
                 url = window.URL || window.webkitURL;
             for (let f = 0; f < fs.length; f++) {
+                // console.log(fs[f]);
                 let file = fs[f],
                     imageType = /^image\//;
+
+                fileName = file.name.split(".")[0];
 
                 if (!imageType.test(file.type)) {
                     continue;
@@ -397,7 +401,7 @@
         }
 
         document.getElementById('download').addEventListener('click', function () {
-            downloadCanvas(this, 'myCanvasDice', 'kobe.png');
+            downloadCanvas(this, 'myCanvasDice', fileName + ' dice.png');
         }, false);
 
         function downloadCanvas(link, canvasId, filename) {
