@@ -30,13 +30,13 @@
 
     <!-- 格式化 About this item -->
     <p><textarea placeholder="请输入About this item" id="desc" value=""
-            style="display: block; width: 800px; height: 400px;"></textarea></p>
+            style="display: block; width: 400px; height: 200px;"></textarea></p>
     <p><button onclick="formatDesc()">格式化</button></p>
     <div id="descOutput"></div>
 
     <!-- 格式化表 Product information -->
     <p><textarea placeholder="请输入复制的表格数据" id="items" value=""
-            style="display: block; width: 800px; height: 400px;"></textarea></p>
+            style="display: block; width: 400px; height: 200px;"></textarea></p>
     <p><button onclick="formatItems()">格式化</button></p>
     <div id="itemsOutput"></div>
     <script>
@@ -58,6 +58,7 @@
             let re = /"hiRes":.*?\.jpg/g;
             let imgArr = sourceCode.match(re);
             let a = document.getElementById('getImg'); // 获取dom
+            imgArr = unique(imgArr); // 去重
             // let event = new MouseEvent('click'); // 模拟鼠标click点击事件
             for (let i = 0; i < imgArr.length; i++) {
                 // 下载方法1：会跳转不下载
@@ -74,7 +75,8 @@
                 // alink.click();
 
                 // 下载方法3：可以
-                if (!/null/.test(imgArr[i])) { // 如果不包含null字符
+                console.log(imgArr[i])
+                if (!/null/.test(imgArr[i])) { // 如果不包含null
                     DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg")
                 }
             }
@@ -236,6 +238,7 @@
                 window.URL.revokeObjectURL(url)
             }))
         }
+
         function copy(data) {
             // navigator && navigator.clipboard && navigator.clipboard.writeText(data).then(res => {
             //     console.log(res);
@@ -251,6 +254,10 @@
             document.execCommand("Copy"); // 执行复制命令
             // 复制之后再删除元素，否则无法成功赋值
             copyInput.remove(); // 删除动态创建的节点
+        }
+
+        function unique(arr) {
+            return Array.from(new Set(arr))
 
         }
 
