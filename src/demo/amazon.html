@@ -28,16 +28,19 @@
             src="https://wallpaper-static.cheetahfun.com/wallpaper/sites/beauty/pic1.jpg" width="90%" id="testImg">
     </p> -->
 
+    <!-- 格式化 About this item -->
+    <p><textarea placeholder="请输入About this item" id="desc" value=""
+            style="display: block; width: 800px; height: 400px;"></textarea></p>
+    <p><button onclick="formatDesc()">格式化</button></p>
+    <div id="descOutput"></div>
 
-    <!-- 格式化表格数据 -->
+    <!-- 格式化表 Product information -->
     <p><textarea placeholder="请输入复制的表格数据" id="items" value=""
-            style="display: block; width: 600px; height: 600px;"></textarea></p>
+            style="display: block; width: 800px; height: 400px;"></textarea></p>
     <p><button onclick="formatItems()">格式化</button></p>
     <div id="itemsOutput"></div>
     <script>
         function getPic() {
-
-            // 公用对象
             let sourceCode = document.getElementById("asin").value;
             let iframe = document.getElementById('foo');
 
@@ -71,7 +74,9 @@
                 // alink.click();
 
                 // 下载方法3：可以
-                DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg")
+                if (!/null/.test(imgArr[i])) { // 如果不包含null字符
+                    DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg")
+                }
             }
 
             // 方法2：iframe 里用jq查找。需要在input里输入 asin页面的源代码。
@@ -115,18 +120,64 @@
             //     alert("asin 有误")
             // }
         }
-        function DOWLOAD_FILE(url, fileName) {
-            fetch(url).then(res => res.blob().then(blob => {
-                var a = document.createElement('a')
-                a.href = window.URL.createObjectURL(blob)
-                a.download = fileName
-                a.click()
-                window.URL.revokeObjectURL(url)
-            }))
+
+
+        function formatDesc() {
+            // 注意这里有换行，不能用input 组件，要用 textarea组件
+            let sourceCode = document.getElementById("desc").value;
+
+            // 过滤掉非数字和字符。不行，算了，还是不过滤了
+            // sourceCode = sourceCode.replace(/^[0-9a-zA-Z]*$/g, "")
+
+            // 转成数组，字符串for循环不行
+            sourceCode = sourceCode.split("");
+            let item = "",
+                code = "";
+            for (let i = 0; i < sourceCode.length; i++) {
+                item = sourceCode[i];
+                itemNext = sourceCode[i + 1];
+                if (item !== undefined) code = item.charCodeAt(0).toString(16);
+                if (itemNext !== undefined) codeNext = itemNext.charCodeAt(0).toString(16);
+
+                // 第一个字符前添加<p>。/n 是重点！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                if (i === 0) {
+                    sourceCode[i] = "<h3>About this item</h3>" + "\n" + "<p>" + sourceCode[i]; // 不能用item
+                }
+
+                // 中间替换
+                // if ((code == "9" || code == "20") && codeNext == "200e") {
+                //     sourceCode[i] = ":" // 不能用item
+                //     sourceCode[i + 1] = "<strong>" // 不能用item
+                //     i = i + 1
+                // }
+
+                // 换行替换
+                if (code == "a") {
+                    sourceCode[i - 1] = sourceCode[i - 1] + "</p>"
+                    if (sourceCode[i + 1] != undefined) {
+                        sourceCode[i + 1] = "<p>" + sourceCode[i + 1]
+                    } // 不能用item
+                    i = i + 1
+                }
+
+                // 最后一个
+                if (i === sourceCode.length - 1) {
+                    sourceCode[i] = sourceCode[i] + "</p>"; // 不能用item
+                }
+
+
+                // console.log("item: " + item)
+                // console.log(item.charAt())
+                // console.log(item.charCodeAt().toString(16))
+                // console.log(item.charCodeAt(0).toString(16))
+                // console.log(item.codePointAt().toString(16))
+            }
+            sourceCode = sourceCode.join("").replace(/KWOKING/g, "AEYEE")
+            document.getElementById("desc").value = sourceCode
+            // copy(sourceCode)
         }
 
         function formatItems() {
-            // 公用对象。
             // 注意这里有换行，不能用input 组件，要用 textarea组件
             let sourceCode = document.getElementById("items").value;
             // 转成数组，字符串for循环不行
@@ -136,28 +187,32 @@
             // 空格：9、20
             // 0x200e：200e
             // 换行：a
-            let item = "", code = "";
+            let item = "",
+                code = "";
             for (let i = 0; i < sourceCode.length; i++) {
                 item = sourceCode[i];
                 itemNext = sourceCode[i + 1];
                 if (item !== undefined) code = item.charCodeAt(0).toString(16);
                 if (itemNext !== undefined) codeNext = itemNext.charCodeAt(0).toString(16);
 
-                // 第一个字符前添加<p><strong>
+                // 第一个字符前添加<p>
                 if (i === 0) {
-                    sourceCode[i] = "<p><strong>" + sourceCode[i]; // 不能用item
+                    sourceCode[i] = "\n" + "<h3>Description</h3>" + "\n" + "<p>" + sourceCode[i]; // 不能用item
                 }
 
                 // 中间替换
                 if ((code == "9" || code == "20") && codeNext == "200e") {
-                    sourceCode[i] = ":" // 不能用item
-                    sourceCode[i + 1] = "</strong>" // 不能用item
+                    sourceCode[i] = ": " // 不能用item
+                    sourceCode[i + 1] = "<strong>" // 不能用item
                     i = i + 1
                 }
 
                 // 换行替换
-                if(code == "a") {
-                    sourceCode[i + 1] = "<p><strong>" + sourceCode[i + 1] // 不能用item
+                if (code == "a") {
+                    sourceCode[i - 1] = sourceCode[i - 1] + "</strong></p>"
+                    if (sourceCode[i + 1] != undefined) {
+                        sourceCode[i + 1] = "<p>" + sourceCode[i + 1] // 不能用item
+                    }
                     i = i + 1
                 }
 
@@ -167,7 +222,36 @@
                 // console.log(item.charCodeAt(0).toString(16))
                 // console.log(item.codePointAt().toString(16))
             }
-            document.getElementById("items").value = sourceCode.join("")
+            sourceCode = sourceCode.join("").replace(/KWOKING/g, "AEYEE")
+            document.getElementById("items").value = sourceCode
+            // copy(sourceCode)
+        }
+
+        function DOWLOAD_FILE(url, fileName) {
+            fetch(url).then(res => res.blob().then(blob => {
+                let a = document.createElement('a');
+                a.href = window.URL.createObjectURL(blob)
+                a.download = fileName
+                a.click()
+                window.URL.revokeObjectURL(url)
+            }))
+        }
+        function copy(data) {
+            // navigator && navigator.clipboard && navigator.clipboard.writeText(data).then(res => {
+            //     console.log(res);
+            // }).catch(err => {
+            //     console.log(err)
+            // })
+
+            // 成功复制了，但是把data的换行也去掉了。怎么处理？？？？？
+            let copyInput = document.createElement('textaera'); // 创建input元素。这里不用input，用textaera
+            document.body.appendChild(copyInput); // 向页面底部追加输入框
+            copyInput.setAttribute('value', data); // 添加属性，将url赋值给textaera元素的value属性
+            copyInput.select(); // 选择textaera元素
+            document.execCommand("Copy"); // 执行复制命令
+            // 复制之后再删除元素，否则无法成功赋值
+            copyInput.remove(); // 删除动态创建的节点
+
         }
 
         !function () {
