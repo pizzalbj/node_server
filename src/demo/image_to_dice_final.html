@@ -296,21 +296,24 @@
                     } else { // 填充图片
                         if (thisSectorColor > (255 / part) * (part - 1)) {
                             if (part == 6) {
-                                fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
+                                // fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
+                                fillImg = type != '黑底白字' ? fillImgOne : fillImgSixBlack
                             } else if (part == 7) {
                                 fillImg = type != '黑底白字' ? fillImgZero : fillImgZeroBlack
                             }
                         } else if (thisSectorColor > (255 / part) * (part - 2)) {
                             if (part == 6) {
                                 // fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
-                                fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack) // 变浅 2转1。6的第二个
+                                // fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgTwoBlack) // 变浅 2转1。6的第二个
+                                fillImg = type != '黑底白字' ? (bothSides ? fillImgOne : fillImgTwo) : (bothSides ? fillImgOneBlack : fillImgFiveBlack) // 变浅 2转1。6的第二个
                             } else if (part == 7) {
                                 // fillImg = type != '黑底白字' ? fillImgOne : fillImgOneBlack
                                 fillImg = type != '黑底白字' ? (bothSides ? fillImgZero : fillImgOne) : (bothSides ? fillImgZeroBlack : fillImgOneBlack) // 变浅 1转0。7的第二个
                             }
                         } else if (thisSectorColor > (255 / part) * (part - 3)) {
                             if (part == 6) {
-                                fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                                // fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
+                                fillImg = type != '黑底白字' ? fillImgThree : fillImgFourBlack
                                 // fillImg = type != '黑底白字' ? (bothSides ? fillImgTwo : fillImgThree) : (bothSides ? fillImgTwoBlack : fillImgThreeBlack) // 变浅 3转2。6的第三个
                             } else if (part == 7) {
                                 fillImg = type != '黑底白字' ? fillImgTwo : fillImgTwoBlack
@@ -318,7 +321,8 @@
                             }
                         } else if (thisSectorColor > (255 / part) * (part - 4)) {
                             if (part == 6) {
-                                fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                                // fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
+                                fillImg = type != '黑底白字' ? fillImgFour : fillImgThreeBlack
                                 // fillImg = type != '黑底白字' ? (bothSides ? fillImgFive : fillImgFour) : (bothSides ? fillImgFiveBlack : fillImgFourBlack) // 变深 4转5。6的倒数第三个
                             } else if (part == 7) {
                                 fillImg = type != '黑底白字' ? fillImgThree : fillImgThreeBlack
@@ -326,14 +330,16 @@
                         } else if (thisSectorColor > (255 / part) * (part - 5)) {
                             if (part == 6) {
                                 // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
-                                fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack) // 变深 5转6。6的倒数第二个
+                                // fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack) // 变深 5转6。6的倒数第二个
+                                fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgTwoBlack) // 变深 5转6。6的倒数第二个
                             } else if (part == 7) {
                                 fillImg = type != '黑底白字' ? fillImgFour : fillImgFourBlack
                                 // fillImg = type != '黑底白字' ? bothSides ? fillImgFive : fillImgFour : bothSides ? fillImgFiveBlack : fillImgFourBlack // 变深 4转5。7的倒数第三个
                             }
                         } else if (thisSectorColor >= (255 / part) * (part - 6)) {
                             if (part == 6) {
-                                fillImg = type != '黑底白字' ? fillImgSix : fillImgSixBlack
+                                // fillImg = type != '黑底白字' ? fillImgSix : fillImgSixBlack
+                                fillImg = type != '黑底白字' ? fillImgSix : fillImgOneBlack
                             } else if (part == 7) {
                                 // fillImg = type != '黑底白字' ? fillImgFive : fillImgFiveBlack
                                 fillImg = type != '黑底白字' ? (bothSides ? fillImgSix : fillImgFive) : (bothSides ? fillImgSixBlack : fillImgFiveBlack) // 变深 5转6。7的倒数第二个

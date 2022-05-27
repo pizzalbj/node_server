@@ -10,16 +10,18 @@
 </head>
 
 <body>
-    <!-- 获取图片 -->
-    <p><input placeholder="请复制拷贝asin页面的源代码" id="asin" value=""
-            style="display: block; width: 300px; height: 100px;"></input></p>
-    <p><button onclick="getPic()">获取图片</button></p>
+    <!-- 左边 -->
+    <div style="width: 40%; display: inline-block;">
+        <!-- 获取图片 -->
+        <p><input placeholder="请复制拷贝asin页面的源代码" id="asin" value=""
+                style="display: block; width: 400px; height: 200px;"></input></p>
+        <p><button onclick="getPic()">获取图片 1</button></p>
 
-    <!-- Refused to display 'https://www.amazon.com/' in a frame because it set 'X-Fr -->
-    <!-- <iframe id="foo" src="https://www.amazon.com/dp/B072JKCL7D"></iframe> -->
-    <!-- <p><iframe id="foo"></iframe></p> -->
+        <!-- Refused to display 'https://www.amazon.com/' in a frame because it set 'X-Fr -->
+        <!-- <iframe id="foo" src="https://www.amazon.com/dp/B072JKCL7D"></iframe> -->
+        <!-- <p><iframe id="foo"></iframe></p> -->
 
-    <!-- <p style="display: block; width: 100px; height:100px;">
+        <!-- <p style="display: block; width: 100px; height:100px;">
         <a id="getImg" href="" download="">点击下载图片</a>
     </p>
 
@@ -28,17 +30,27 @@
             src="https://wallpaper-static.cheetahfun.com/wallpaper/sites/beauty/pic1.jpg" width="90%" id="testImg">
     </p> -->
 
-    <!-- 格式化 About this item -->
-    <p><textarea placeholder="请输入About this item" id="desc" value=""
-            style="display: block; width: 400px; height: 200px;"></textarea></p>
-    <p><button onclick="formatDesc()">格式化</button></p>
-    <div id="descOutput"></div>
+        <!-- 格式化 About this item -->
+        <p><textarea placeholder="请输入About this item" id="desc" value=""
+                style="display: block; width: 400px; height: 200px;"></textarea></p>
+        <p><button onclick="formatDesc()">格式化 About this item 2</button></p>
+        <div id="descOutput"></div>
+    </div>
 
-    <!-- 格式化表 Product information -->
-    <p><textarea placeholder="请输入复制的表格数据" id="items" value=""
-            style="display: block; width: 400px; height: 200px;"></textarea></p>
-    <p><button onclick="formatItems()">格式化</button></p>
-    <div id="itemsOutput"></div>
+    <!-- 右边 -->
+    <div style="width: 40%; display: inline-block;">
+        <!-- 格式化 About this item -->
+        <p><textarea placeholder="请输入Description" id="descA" value=""
+                style="display: block; width: 400px; height: 200px;"></textarea></p>
+        <p><button onclick="formatDescA()">格式化 Description 3</button></p>
+        <div id="descAOutput"></div>
+
+        <!-- 格式化表 Product information -->
+        <p><textarea placeholder="请输入复制的表格数据" id="items" value=""
+                style="display: block; width: 400px; height: 200px;"></textarea></p>
+        <p><button onclick="formatItems()">格式化 table 4</button></p>
+        <div id="itemsOutput"></div>
+    </div>
     <script>
         function getPic() {
             let sourceCode = document.getElementById("asin").value;
@@ -75,9 +87,12 @@
                 // alink.click();
 
                 // 下载方法3：可以
+                console.log(i)
                 console.log(imgArr[i])
+                // console.log("==")
                 if (!/null/.test(imgArr[i])) { // 如果不包含null
-                    DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg")
+                    console.log(" ")
+                    DOWLOAD_FILE(imgArr[i].substring(9), i + ".jpg", i)
                 }
             }
 
@@ -123,7 +138,7 @@
             // }
         }
 
-
+        // About this item
         function formatDesc() {
             // 注意这里有换行，不能用input 组件，要用 textarea组件
             let sourceCode = document.getElementById("desc").value;
@@ -179,6 +194,65 @@
             // copy(sourceCode)
         }
 
+        function formatDescA() {
+            // 注意这里有换行，不能用input 组件，要用 textarea组件
+            let sourceCode = document.getElementById("descA").value;
+
+            // 过滤掉非数字和字符。不行，算了，还是不过滤了
+            // sourceCode = sourceCode.replace(/^[0-9a-zA-Z]*$/g, "")
+
+            // 转成数组，字符串for循环不行
+            sourceCode = sourceCode.split("");
+            let item = "",
+                code = "";
+            for (let i = 0; i < sourceCode.length; i++) {
+                item = sourceCode[i];
+                itemNext = sourceCode[i + 1];
+                if (item !== undefined) code = item.charCodeAt(0).toString(16);
+                if (itemNext !== undefined) codeNext = itemNext.charCodeAt(0).toString(16);
+
+                // 第一个字符前添加<p>。/n 是重点！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                if (i === 0) {
+                    sourceCode[i] = "<h3>Product Description</h3>" + "\n" + "<p>" + sourceCode[i]; // 不能用item
+                }
+
+                // 中间替换
+                if (code == "3a") {
+                    // : 追加空格
+                    if (sourceCode[i + 1] != undefined || sourceCode[i + 1] != " ") {
+                        sourceCode[i] = sourceCode[i] + " <strong>"
+                    } else {
+                        sourceCode[i] = sourceCode[i] + "<strong>"
+                    }
+                    i = i + 1
+                }
+
+                // 换行替换
+                if (code == "a") {
+                    sourceCode[i - 1] = sourceCode[i - 1] + "</strong></p>"
+                    if (sourceCode[i + 1] != undefined) {
+                        sourceCode[i + 1] = "<p>" + sourceCode[i + 1]
+                    } // 不能用item
+                    i = i + 1
+                }
+
+                // 最后一个
+                if (i === sourceCode.length - 1) {
+                    sourceCode[i] = sourceCode[i] + "</p>"; // 不能用item
+                }
+
+
+                // console.log("item: " + item)
+                // console.log(item.charAt())
+                // console.log(item.charCodeAt().toString(16))
+                // console.log(item.charCodeAt(0).toString(16))
+                // console.log(item.codePointAt().toString(16))
+            }
+            sourceCode = sourceCode.join("").replace(/KWOKING/g, "AEYEE")
+            document.getElementById("descA").value = sourceCode
+            // copy(sourceCode)
+        }
+
         function formatItems() {
             // 注意这里有换行，不能用input 组件，要用 textarea组件
             let sourceCode = document.getElementById("items").value;
@@ -189,6 +263,7 @@
             // 空格：9、20
             // 0x200e：200e
             // 换行：a
+            // 冒号英文：3a
             let item = "",
                 code = "";
             for (let i = 0; i < sourceCode.length; i++) {
@@ -199,7 +274,7 @@
 
                 // 第一个字符前添加<p>
                 if (i === 0) {
-                    sourceCode[i] = "\n" + "<h3>Description</h3>" + "\n" + "<p>" + sourceCode[i]; // 不能用item
+                    sourceCode[i] = "\n" + "<h3>Product information</h3>" + "\n" + "<p>" + sourceCode[i]; // 不能用item
                 }
 
                 // 中间替换
@@ -229,13 +304,26 @@
             // copy(sourceCode)
         }
 
-        function DOWLOAD_FILE(url, fileName) {
+        function DOWLOAD_FILE(url, fileName, i) {
+            // 有个bug，chrome 貌似最多同时10个下载，然后会忽略其他的。Firefox 不会有这个问题！！！！！！！！
+            // 可以使用 multi-download。这里使用settimeout先解决！！！！！！！！！！！
             fetch(url).then(res => res.blob().then(blob => {
-                let a = document.createElement('a');
-                a.href = window.URL.createObjectURL(blob)
-                a.download = fileName
-                a.click()
-                window.URL.revokeObjectURL(url)
+                setTimeout(function () {
+                    var a = document.createElement('a');
+                    a.href = window.URL.createObjectURL(blob)
+                    a.download = fileName
+                    a.click()
+                    console.log(a)
+                    window.URL.revokeObjectURL(url)
+                    console.log(fileName + ": here")
+                }, i * 1000)
+                // var a = document.createElement('a');
+                // a.href = window.URL.createObjectURL(blob)
+                // a.download = fileName
+                // a.click()
+                // console.log(a)
+                // window.URL.revokeObjectURL(url)
+                // console.log(fileName + ": here")
             }))
         }
 
